@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa; /* Soft light gray */
+    color: #333; /* Dark gray for text */
+    text-align: center;
+}
+
+header {
+    background: #212529; /* Deep dark gray */
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: #f8f9fa; /* Light gray */
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+nav ul li a:hover {
+    color: #adb5bd; /* Muted gray */
+}
+
+section {
+    margin: 50px auto;
+    padding: 30px;
+    width: 80%;
+    max-width: 800px;
+    background: white;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+}
+
+button {
+    background: #495057; /* Cool dark gray */
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.3s, transform 0.2s;
+}
+
+button:hover {
+    background: #343a40; /* Slightly darker shade */
+    transform: translateY(-2px);
+}
+
+footer {
+    margin-top: 30px;
+    background: #212529; /* Deep dark gray */
+    color: white;
+    padding: 15px;
+    font-size: 14px;
+}
