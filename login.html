@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styles2.css">
+</head>
+<body>
+    <header>
+        <h1>Login</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="register.html">Register</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section>
+        <h2>Welcome Back! Please Log In</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+            </div>
+            <button type="submit">Log In</button>
+        </form>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 AI-Powered Hangout Picker. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Add an event listener for the form submission
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent the default form submission
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            console.log("Email:", email);
+            console.log("Password:", password);
+
+            try {
+                // Send POST request to the backend
+                const response = await fetch('http://localhost:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const result = await response.json();
+
+                console.log("Response result:", result); // Log the response for debugging
+
+                if (response.ok) {
+                    alert('Login successful');
+                    window.location.href = 'index.html'; // Redirect to homepage
+                } else {
+                    alert(result.message || "Something went wrong!"); // Show error message from backend
+                }
+            } catch (error) {
+                console.error("Error during login:", error);
+                alert("An error occurred while logging in. Please try again.");
+            }
+        });
+    </script>
+</body>
+</html>
