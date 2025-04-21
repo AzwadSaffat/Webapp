@@ -1,18 +1,22 @@
 const express = require('express');
+const path = require('path');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const authRoutes = require('./backend/routes/authRoutes'); // Path to your authentication routes
+const cors = require('cors');
+const authRoutes = require('./backend/routes/authRoutes');  // Path to your authentication routes
 
-// Initialize express app
 const app = express();
+
+// Enable CORS for all routes
+app.use(cors());
 
 // Body parser middleware to parse JSON
 app.use(bodyParser.json());
 
-// MongoDB Atlas connection string (replace with your own credentials)
+// MongoDB Atlas connection string
 const dbURI = 'mongodb+srv://Azwad:azwadhossain@cluster0.nnjb8bt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 
-// Connect to MongoDB Atlas
+// Connect to MongoDB
 mongoose.connect(dbURI)
   .then(() => {
     console.log('MongoDB connected');
@@ -21,30 +25,44 @@ mongoose.connect(dbURI)
     console.log('MongoDB connection error:', err);
   });
 
-// Use the authentication routes
+// Serve static files from the 'public' directory (to serve styles, images, JS files)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve the login.html file from the root directory
+app.get('/', (req, res) => {
+    console.log('Root route accessed'); // Log when the root route is accessed
+    res.sendFile(path.join(__dirname, 'login.html'));  // Adjust path if necessary
+});
+
+// Serve the index.html file for the home route
+app.get('/index.html', (req, res) => {
+  console.log('Index route accessed');
+  res.sendFile(path.join(__dirname, 'index.html'));  // Adjust the path to point to index.html in the root directory
+});
+
+
+app.get('/recommendations.html', (req, res) => {
+  console.log('Rec route accessed');
+  res.sendFile(path.join(__dirname, 'recommendations.html'));  // Adjust the path to point to index.html in the root directory
+});
+
+
+app.get('/polls.html', (req, res) => {
+  console.log('Poll route accessed');
+  res.sendFile(path.join(__dirname, 'polls.html'));  // Adjust the path to point to index.html in the root directory
+});
+
+
+app.get('/schedule.html', (req, res) => {
+  console.log('Schedule route accessed');
+  res.sendFile(path.join(__dirname, 'schedule.html'));  // Adjust the path to point to index.html in the root directory
+});
+
+// Use the authentication routes (this will include the login and register routes)
 app.use('/api/auth', authRoutes);
 
 // Set up the server to listen on a specific port
 const port = 5000;
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    console.log(`Server running on http://localhost:${port}`);
 });
-// POST route for user login
-app.post('/api/login', async (req, res) => {
-    const { email, password } = req.body;
-  
-    // Check if user exists
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: 'User not found' });
-    }
-  
-    // Check if the password matches
-    const isMatch = await user.matchPassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-  
-    // Return a success message if login is successful
-    res.status(200).json({ message: 'Login successful', user: { name: user.name, email: user.email } });
-  });
