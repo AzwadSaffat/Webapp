@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const authRoutes = require('./backend/routes/authRoutes');  // Path to your authentication routes
+const locationRoutes = require('./backend/routes/locationRoutes');  // Path to your location routes
 
 const app = express();
 
@@ -57,6 +58,8 @@ app.get('/schedule.html', (req, res) => {
   console.log('Schedule route accessed');
   res.sendFile(path.join(__dirname, 'schedule.html'));  // Adjust the path to point to index.html in the root directory
 });
+
+app.use('/api/locations', locationRoutes);
 
 // Use the authentication routes (this will include the login and register routes)
 app.use('/api/auth', authRoutes);
