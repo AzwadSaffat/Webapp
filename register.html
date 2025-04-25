@@ -12,7 +12,7 @@
         <nav>
             <ul>
                 <li><a href="index.html">Home</a></li>
-                <li><a href="login.html">Login</a></li>
+                <button onclick="navigateTo('login.html')">Login</button>
             </ul>
         </nav>
     </header>
@@ -48,19 +48,31 @@
         // Add event listener for the form submission
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();  // Prevent the default form submission
-
+    
             // Get the form data
             const email = document.getElementById('email').value;
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
-
+    
+            // Validate input fields
+            if (!email || !username || !password || !confirmPassword) {
+                alert('All fields are required!');
+                return;
+            }
+    
             // Validate password match
             if (password !== confirmPassword) {
                 alert('Passwords do not match!');
                 return;
             }
-
+    
+            // You can add password strength validation here (optional)
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long!');
+                return;
+            }
+    
             // Send the data to the backend
             const response = await fetch('http://localhost:5000/api/auth/register', {
                 method: 'POST',
@@ -69,16 +81,21 @@
                 },
                 body: JSON.stringify({ email, username, password })
             });
-
+    
             const result = await response.json();
-
+    
+            // Handle success or failure
             if (response.ok) {
                 alert('Registration successful!');
                 window.location.href = 'login.html'; // Redirect to login page
             } else {
-                alert(result.message); // Show error message from backend
+                alert(result.message || 'Registration failed. Please try again.'); // Show error message from backend
             }
         });
+        function navigateTo(page) {
+            window.location.href = page;
+        }
     </script>
+    
 </body>
 </html>

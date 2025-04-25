@@ -57,6 +57,16 @@ app.get('/schedule.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'schedule.html'));  // Adjust the path to point to schedule.html
 });
 
+app.get('/register.html', (req, res) => {
+  console.log('Register route accessed');
+  res.sendFile(path.join(__dirname, 'register.html'));  // Adjust the path to point to schedule.html
+});
+
+app.get('/login.html', (req, res) => {
+  console.log('Login route accessed');
+  res.sendFile(path.join(__dirname, 'login.html'));  // Adjust the path to point to schedule.html
+});
+
 // Add the recommendations route
 app.post('/api/recommendations', async (req, res) => {
   const { location, price_range, type } = req.body;
