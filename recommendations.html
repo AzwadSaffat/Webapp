@@ -22,11 +22,130 @@
     <section>
         <h2>Get AI-Powered Hangout Suggestions</h2>
         <p>Click below to generate recommendations based on your preferences.</p>
-        <button onclick="alert('Generating Recommendations...')">Get Recommendations</button>
+        
+        <!-- Location Dropdown -->
+        <label for="location">Choose a location:</label>
+        <select id="location" name="location">
+            <option value="Any">Any</option>
+            <option value="Dhanmondi">Dhanmondi</option>
+            <option value="Bashundhara R/A">Bashundhara R/A</option>
+            <option value="Gulshan">Gulshan</option>
+            <option value="Gulshan 1">Gulshan 1</option>
+            <option value="Gulshan 2">Gulshan 2</option>
+            <option value="Banani">Banani</option>
+            <option value="Uttara">Uttara</option>
+            <option value="Segunbagicha">Segunbagicha</option>
+            <option value="Airport">Airport</option>
+        </select>
+
+        <br><br>
+
+        <!-- Price Range Dropdown -->
+        <label for="price-range">Choose a price range:</label>
+        <select id="price-range" name="price-range">
+            <option value="Any">Any</option>
+            <option value="$">$</option>
+            <option value="$$">$$</option>
+            <option value="$$$">$$$</option>
+            <option value="$$$$">$$$$</option>
+        </select>
+
+        <br><br>
+
+        <!-- Type Dropdown -->
+        <label for="type">Choose a type:</label>
+        <select id="type" name="type">
+            <option value="Any">Any</option>
+            <option value="Shopping Mall">Shopping Mall</option>
+            <option value="Park">Park</option>
+            <option value="Museum">Museum</option>
+            <option value="Hotel">Hotel</option>
+            <option value="Café">Café</option>
+            <option value="Restaurant">Restaurant</option>
+            <option value="Market">Market</option>
+        </select>
+
+        <br><br>
+
+        <button onclick="getRecommendations()">Get Recommendations</button>
+
+        <!-- Recommendations will be displayed here -->
+        <!-- <div id="recommendations"></div> -->
+        
+        <table id="recommendations-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Rating</th>
+                </tr>
+            </thead>
+            <tbody id="recommendations-body">
+                <!-- Results will be added here dynamically -->
+            </tbody>
+        </table>
     </section>
 
     <footer>
         <p>&copy; 2025 AI-Powered Hangout Picker. All rights reserved.</p>
     </footer>
+
+    <script>
+        function getRecommendations() {
+            // Get values from dropdowns
+            const location = document.getElementById('location').value;
+            const priceRange = document.getElementById('price-range').value;
+            const type = document.getElementById('type').value;
+
+            // Prepare the request body
+            const requestData = { location, price_range: priceRange, type };
+
+            console.log('Sending request:', requestData);  // Log the request data for debugging
+
+            // Make the POST request to the backend API
+            fetch('http://localhost:5000/api/locations/recommendations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData),
+            })
+            .then(response => {
+                // Check if the response is OK (status 200)
+                if (!response.ok) {
+                    // Log and throw error if status is not OK (not 200-299)
+                    throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
+                }
+                return response.json();  // Parse the response as JSON if it's OK
+            })
+            .then(data => {
+                console.log('Response received:', data);  // Log the response data for debugging
+
+                // Get the recommendations table body
+                const recommendationsBody = document.getElementById('recommendations-body');
+                recommendationsBody.innerHTML = ''; // Clear previous results
+
+                if (data.length > 0) {
+                    // Loop through the returned data and populate the table
+                    data.forEach(location => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${location.name}</td>
+                            <td>${location.rating}</td>
+                        `;
+                        recommendationsBody.appendChild(row);
+                    });
+                } else {
+                    recommendationsBody.innerHTML = '<tr><td colspan="2">No recommendations found based on your criteria.</td></tr>';
+                }
+            })
+            .catch(error => {
+                // Handle and log any errors from the fetch request
+                console.error('Error fetching recommendations:', error);
+                const recommendationsBody = document.getElementById('recommendations-body');
+                recommendationsBody.innerHTML = '<tr><td colspan="2">An error occurred while fetching recommendations. Please try again later.</td></tr>';
+            });
+        }
+
+    </script>
 </body>
 </html>

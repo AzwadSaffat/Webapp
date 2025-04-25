@@ -41,28 +41,45 @@ app.get('/index.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));  // Adjust the path to point to index.html in the root directory
 });
 
-
+// Serve other HTML files
 app.get('/recommendations.html', (req, res) => {
   console.log('Rec route accessed');
-  res.sendFile(path.join(__dirname, 'recommendations.html'));  // Adjust the path to point to index.html in the root directory
+  res.sendFile(path.join(__dirname, 'recommendations.html'));  // Adjust the path to point to recommendations.html
 });
-
 
 app.get('/polls.html', (req, res) => {
   console.log('Poll route accessed');
-  res.sendFile(path.join(__dirname, 'polls.html'));  // Adjust the path to point to index.html in the root directory
+  res.sendFile(path.join(__dirname, 'polls.html'));  // Adjust the path to point to polls.html
 });
-
 
 app.get('/schedule.html', (req, res) => {
   console.log('Schedule route accessed');
-  res.sendFile(path.join(__dirname, 'schedule.html'));  // Adjust the path to point to index.html in the root directory
+  res.sendFile(path.join(__dirname, 'schedule.html'));  // Adjust the path to point to schedule.html
 });
 
-app.use('/api/locations', locationRoutes);
+// Add the recommendations route
+app.post('/api/recommendations', async (req, res) => {
+  const { location, price_range, type } = req.body;
+
+  try {
+    // Query to filter locations based on user's input
+    const recommendations = await Location.find({
+      location: { $regex: location, $options: 'i' }, // Case-insensitive search
+      price_range: price_range !== 'Any' ? price_range : { $exists: true },
+      type: type !== 'Any' ? type : { $exists: true }
+    });
+
+    res.status(200).json(recommendations); // Return filtered locations
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching recommendations', error });
+  }
+});
 
 // Use the authentication routes (this will include the login and register routes)
 app.use('/api/auth', authRoutes);
+
+// Use the location routes
+app.use('/api/locations', locationRoutes);
 
 // Set up the server to listen on a specific port
 const port = 5000;

@@ -1,59 +1,51 @@
 const express = require('express');
 const router = express.Router();
-const Location = require('../models/location');
+const Location = require('../models/location'); // Import your Location model
 
-router.post('/add', async (req, res) => {
-  const locationData = [
-    {
-      name: "Elements – Global Dining at InterContinental Dhaka",
-      type: "Restaurant",
-      price_range: "$$$$",
-      rating: 5.0,
-      popularity_rating: 95
-    },
-    {
-      name: "Aqua Deck at InterContinental Dhaka",
-      type: "Bar",
-      price_range: "$$$$",
-      rating: 5.0,
-      popularity_rating: 90
-    },
-    {
-      name: "The Garden Kitchen at Sheraton Dhaka",
-      type: "Restaurant",
-      price_range: "$$$$",
-      rating: 5.0,
-      popularity_rating: 88
-    },
-    {
-      name: "HangOut - Dhanmondi",
-      type: "Café",
-      price_range: "$$",
-      rating: 3.5,
-      popularity_rating: 75
-    },
-    {
-      name: "Justice Shahabuddin Ahmed Park",
-      type: "Park",
-      price_range: "$",
-      rating: 4.2,
-      popularity_rating: 80
-    },
-    {
-      name: "Dhanmondi Lake",
-      type: "Lake",
-      price_range: "$",
-      rating: 4.0,
-      popularity_rating: 78
-    }
-  ];
-
+// Route to get all locations (for recommendations, etc.)
+router.get('/', async (req, res) => {
   try {
-    await Location.insertMany(locationData);
-    res.status(201).send('Locations added successfully');
+    const locations = await Location.find();
+    res.status(200).json(locations); // Return all locations as JSON
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Error adding locations');
+    console.error('Error fetching locations:', error); // Log error to the console
+    res.status(500).json({ message: 'Error fetching locations', error });
+  }
+});
+
+// Route to get recommendations based on filters (location, price range, type)
+router.post('/recommendations', async (req, res) => {
+  const { location, price_range, type } = req.body;
+  try {
+    const query = {};
+
+    // Handle the location filter (case-insensitive)
+    if (location && location !== 'Any') {
+      query.location = { $regex: location, $options: 'i' };  // Case-insensitive match
+    }
+
+    // Handle the price_range filter
+    if (price_range && price_range !== 'Any') {
+      query.price_range = price_range;
+    }
+
+    // Handle the type filter
+    if (type && type !== 'Any') {
+      query.type = type;
+    }
+
+    // Fetch the recommendations based on the filters
+    const recommendations = await Location.find(query);
+
+    // If no recommendations found, send a meaningful message
+    if (recommendations.length === 0) {
+      return res.status(404).json({ message: 'No recommendations found for the given filters' });
+    }
+
+    res.status(200).json(recommendations); // Return the filtered recommendations
+  } catch (error) {
+    console.error('Error fetching recommendations:', error); // Log error to the console
+    res.status(500).json({ message: 'Error fetching recommendations', error });
   }
 });
 
