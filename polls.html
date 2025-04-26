@@ -5,8 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Polls & Voting</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            width: 60%;
+            margin: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-size: 16px;
+            display: inline-block;
+            margin-bottom: 5px;
+            width: 120px;
+        }
+        input[type="text"], button {
+            padding: 8px;
+            font-size: 16px;
+            width: calc(100% - 16px);
+            margin-bottom: 10px;
+        }
+        .poll-list {
+            margin-top: 20px;
+        }
+        .poll-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .poll-item input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.2); /* Enlarge radio buttons for better clarity */
+        }
+        .poll-item label {
+            font-size: 16px;
+        }
+        .poll-results {
+            margin-top: 20px;
+        }
+        .result-bar {
+            height: 30px;
+            margin-top: 10px;
+            background-color: #ddd;
+            border-radius: 5px;
+        }
+        .result-bar div {
+            height: 100%;
+            text-align: center;
+            color: white;
+            line-height: 30px;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            padding: 10px;
+            border: none;
+            font-size: 16px;
+            width: 100%;
+            max-width: 200px;
+            display: block;
+            margin: 10px auto;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        h1, h2, h3 {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
+
     <header>
         <h1>Polls & Voting</h1>
         <nav>
@@ -19,14 +94,126 @@
         </nav>
     </header>
 
-    <section>
+    <section class="container">
         <h2>Create and Vote on Hangout Options</h2>
         <p>Start a poll and let your friends decide!</p>
-        <button onclick="alert('Creating a poll...')">Create a Poll</button>
+
+        <div class="form-group">
+            <label for="place-name">Enter Place Name:</label>
+            <input type="text" id="place-name" placeholder="Enter the place name">
+        </div>
+        <button onclick="addPlace()">Insert</button>
+
+        <div class="poll-list">
+            <h3>Poll Options:</h3>
+            <form id="poll-form">
+                <!-- Poll items will be added here dynamically -->
+            </form>
+        </div>
+
+        <button onclick="vote()">Vote</button>
+
+        <div class="poll-results">
+            <h3>Poll Results:</h3>
+            <div id="results">
+                <!-- Poll results will be shown here -->
+            </div>
+        </div>
     </section>
 
     <footer>
         <p>&copy; 2025 AI-Powered Hangout Picker. All rights reserved.</p>
     </footer>
+
+    <script>
+        let places = [];
+        let votes = [];
+
+        // Function to add a new place to the poll
+        function addPlace() {
+            const placeName = document.getElementById("place-name").value;
+            if (placeName === "") {
+                alert("Please enter a place name.");
+                return;
+            }
+
+            // Add the new place to the list of places
+            places.push(placeName);
+            votes.push(0); // Initially, no votes for the new place
+
+            // Update the poll list
+            updatePollList();
+
+            // Clear the input field
+            document.getElementById("place-name").value = "";
+        }
+
+        // Function to update the poll list with radio buttons
+        function updatePollList() {
+            const pollForm = document.getElementById("poll-form");
+            pollForm.innerHTML = "";  // Clear the existing list
+
+            places.forEach((place, index) => {
+                const pollItem = document.createElement("div");
+                pollItem.classList.add("poll-item");
+
+                const radioButton = document.createElement("input");
+                radioButton.type = "radio";
+                radioButton.name = "poll-option";
+                radioButton.value = index;
+
+                const label = document.createElement("label");
+                label.textContent = place;
+
+                pollItem.appendChild(radioButton);
+                pollItem.appendChild(label);
+
+                pollForm.appendChild(pollItem);
+            });
+        }
+
+        // Function to handle voting
+        function vote() {
+            const selectedOption = document.querySelector('input[name="poll-option"]:checked');
+            if (!selectedOption) {
+                alert("Please select a place to vote for.");
+                return;
+            }
+
+            // Get the index of the selected option
+            const index = selectedOption.value;
+
+            // Increment the vote count for the selected place
+            votes[index]++;
+
+            // Update the poll results
+            updateResults();
+        }
+
+        // Function to update the poll results and show the percentage graph
+        function updateResults() {
+            const totalVotes = votes.reduce((acc, vote) => acc + vote, 0);
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = "";  // Clear the existing results
+
+            places.forEach((place, index) => {
+                const voteCount = votes[index];
+                const percentage = totalVotes > 0 ? (voteCount / totalVotes) * 100 : 0;
+
+                // Create the result bar
+                const resultBar = document.createElement("div");
+                resultBar.classList.add("result-bar");
+
+                const bar = document.createElement("div");
+                bar.style.width = `${percentage}%`;
+                bar.style.backgroundColor = "#4CAF50";
+                bar.textContent = `${place}: ${Math.round(percentage)}%`;
+
+                resultBar.appendChild(bar);
+                resultsDiv.appendChild(resultBar);
+            });
+        }
+    </script>
+
 </body>
 </html>

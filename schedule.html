@@ -5,8 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Schedule Hangout</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-size: 16px;
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+            padding: 5px 10px;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
 </head>
 <body>
+
     <header>
         <h1>Schedule Your Hangout</h1>
         <nav>
@@ -21,12 +81,121 @@
 
     <section>
         <h2>Pick a Time and Finalize Your Plans</h2>
-        <p>Select a date and confirm your hangout.</p>
-        <button onclick="alert('Scheduling your hangout...')">Set a Date</button>
+        <p>Select a date, time, and location for your hangout.</p>
+
+        <div class="form-group">
+            <label for="hangout-date">Select Date:</label>
+            <input type="date" id="hangout-date">
+        </div>
+
+        <div class="form-group">
+            <label for="hangout-time">Select Time:</label>
+            <input type="time" id="hangout-time">
+        </div>
+
+        <div class="form-group">
+            <label for="hangout-place">Enter Place:</label>
+            <input type="text" id="hangout-place" placeholder="Enter hangout place">
+        </div>
+
+        <button onclick="addSchedule()">Done</button>
+
+        <h3>Your Schedule</h3>
+        <table id="schedule-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Place</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Scheduled hangouts will appear here -->
+            </tbody>
+        </table>
     </section>
 
     <footer>
         <p>&copy; 2025 AI-Powered Hangout Picker. All rights reserved.</p>
     </footer>
+
+    <script>
+        // Load the stored hangout history from localStorage when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadHistory();
+        });
+
+        // Function to add the new schedule
+        function addSchedule() {
+            const date = document.getElementById("hangout-date").value;
+            const time = document.getElementById("hangout-time").value;
+            const place = document.getElementById("hangout-place").value;
+
+            if (date === "" || time === "" || place === "") {
+                alert("Please fill out all fields!");
+                return;
+            }
+
+            const schedule = { date, time, place };
+            const schedules = JSON.parse(localStorage.getItem('hangoutHistory')) || [];
+            schedules.push(schedule);
+            localStorage.setItem('hangoutHistory', JSON.stringify(schedules));
+
+            // Reload the schedule table with updated history
+            loadHistory();
+
+            // Clear the input fields
+            document.getElementById("hangout-date").value = "";
+            document.getElementById("hangout-time").value = "";
+            document.getElementById("hangout-place").value = "";
+        }
+
+        // Function to load the hangout history from localStorage and display it in the table
+        function loadHistory() {
+            const schedules = JSON.parse(localStorage.getItem('hangoutHistory')) || [];
+            const tableBody = document.querySelector("#schedule-table tbody");
+            tableBody.innerHTML = "";  // Clear the table before adding new rows
+
+            schedules.forEach((schedule, index) => {
+                const newRow = document.createElement("tr");
+
+                const dateCell = document.createElement("td");
+                dateCell.textContent = schedule.date;
+                newRow.appendChild(dateCell);
+
+                const timeCell = document.createElement("td");
+                timeCell.textContent = schedule.time;
+                newRow.appendChild(timeCell);
+
+                const placeCell = document.createElement("td");
+                placeCell.textContent = schedule.place;
+                newRow.appendChild(placeCell);
+
+                // Create the delete button
+                const actionCell = document.createElement("td");
+                const deleteButton = document.createElement("button");
+                deleteButton.classList.add("delete-btn");
+                deleteButton.textContent = "Delete";
+                deleteButton.onclick = function() {
+                    deleteSchedule(index);
+                };
+                actionCell.appendChild(deleteButton);
+                newRow.appendChild(actionCell);
+
+                tableBody.appendChild(newRow);
+            });
+        }
+
+        // Function to delete a schedule from localStorage and update the table
+        function deleteSchedule(index) {
+            const schedules = JSON.parse(localStorage.getItem('hangoutHistory')) || [];
+            schedules.splice(index, 1);  // Remove the schedule at the specified index
+            localStorage.setItem('hangoutHistory', JSON.stringify(schedules));
+
+            // Reload the schedule table with updated history
+            loadHistory();
+        }
+    </script>
 </body>
 </html>
